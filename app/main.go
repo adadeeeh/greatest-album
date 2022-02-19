@@ -87,7 +87,6 @@ func getAlbum() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		number := c.Param("number")
 		newNumber, _ := strconv.Atoi(number)
-		collection := connectDB().Database("greatest-album").Collection("album")
 
 		var result album
 		err := collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
@@ -95,8 +94,6 @@ func getAlbum() gin.HandlerFunc {
 			log.Fatal(err)
 		}
 
-		c.JSON(200, gin.H{
-			"data": result,
-		})
+		c.JSON(200, result)
 	}
 }
