@@ -41,6 +41,8 @@ func connectDB()  *mongo.Client {
 	return client
 }
 
+var collection = connectDB().Database("greatest-album").Collection("album")
+
 func main() {
 	r := gin.Default()
 
@@ -61,48 +63,23 @@ func main() {
 
 func getAlbums() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		collection := connectDB().Database("greatest-album").Collection("album")
 		cursor, err := collection.Find(context.TODO(), bson.D{})
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// var albums []album
-
-		// for cursor.Next(context.TODO()) {
-		// 	var album album
-		// 	if err = cursor.Decode(&album); err != nil {
-		// 		log.Fatal(err)
-		// 	}
-
-		// 	albums = append(albums, album)
-		// }
-
-		// fmt.Println(albums)
-
-		// var results []album
-		// err = cursor.All(context.TODO(), &results)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// for _, result := range results {
-		// 	fmt.Println(result)
-		// }
+		var albums []album
 
 		for cursor.Next(context.TODO()) {
-			var result album
-			if err := cursor.Decode(&result); err != nil {
+			var album album
+			if err = cursor.Decode(&album); err != nil {
 				log.Fatal(err)
 			}
-			fmt.Println(result)
-		}
-		if err := cursor.Err(); err != nil {
-			log.Fatal(err)
+
+			albums = append(albums, album)
 		}
 
-		c.JSON(200, gin.H{
-			"message": "get all albums",
-		})
+		c.JSON(200, albums)
 	}
 }
 
