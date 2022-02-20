@@ -4,22 +4,24 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type album struct {
-	Number int
-	Year int
-	Album string
-	Artist string
-	Genre string
-	Subgenre string
+	Number int `json:"Number"` 
+	Year int `json:"Year" validate:"required"`
+	Album string `json:"Album" validate:"required"`
+	Artist string `json:"Artist" validate:"required"`
+	Genre string `json:"Genre" validate:"required"`
+	Subgenre string `json:"Subgenre" validate:"required"`
 }
 
 func connectDB()  *mongo.Client {
@@ -58,6 +60,8 @@ func main() {
 
 	r.GET("/album/:number", getAlbum())
 
+	r.POST("album/", addAlbum())
+
 	r.Run()
 }
 
@@ -95,5 +99,60 @@ func getAlbum() gin.HandlerFunc {
 		}
 
 		c.JSON(200, result)
+	}
+}
+
+func addAlbum() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var album album
+		
+		// bind data to struct
+		if err := c.BindJSON(&album); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// validation empty field
+		if validationErr := validator.New().Struct(&album); validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+		}
+		
+		opts := options.Update().SetUpsert(true)
+		filter := bson.M{"Number": album.Number}
+		update := bson.M{"$set": bson.M{	// Using bson to match the capitalize field
+			"Number": album.Number,
+			"Year": album.Year,
+			"Album": album.Album,
+			"Artist": album.Artist,
+			"Genre": album.Genre,
+			"Subgenre": album.Subgenre,
+		}}
+
+		result, err := collection.UpdateOne(context.TODO(), filter, update, opts)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
+		if result.MatchedCount != 0 {
+			c.JSON(http.StatusCreated, "Matched and replaced an existing document")
+		}
+		if result.UpsertedCount != 0 {
+			c.JSON(http.StatusCreated, result)
+		}
+
+		// Using bson to match the capitalize field
+		// result, err := collection.InsertOne(context.TODO(), bson.M{
+		// 	"Number": album.Number,
+		// 	"Year": album.Year,
+		// 	"Album": album.Album,
+		// 	"Artist": album.Artist,
+		// 	"Genre": album.Genre,
+		// 	"Subgenre": album.Subgenre,
+		// })
+		// if err != nil {
+		// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// }
+
+		// c.JSON(http.StatusCreated, result)
 	}
 }
