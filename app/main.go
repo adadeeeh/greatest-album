@@ -139,20 +139,5 @@ func addAlbum() gin.HandlerFunc {
 		if result.UpsertedCount != 0 {
 			c.JSON(http.StatusCreated, result)
 		}
-
-		// Using bson to match the capitalize field
-		// result, err := collection.InsertOne(context.TODO(), bson.M{
-		// 	"Number": album.Number,
-		// 	"Year": album.Year,
-		// 	"Album": album.Album,
-		// 	"Artist": album.Artist,
-		// 	"Genre": album.Genre,
-		// 	"Subgenre": album.Subgenre,
-		// })
-		// if err != nil {
-		// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// }
-
-		// c.JSON(http.StatusCreated, result)
 	}
 }
