@@ -73,6 +73,8 @@ func main() {
 
 	r.POST("album/", addAlbum())
 
+	r.DELETE("album/:number", deleteAlbum())
+
 	r.Run()
 }
 
@@ -150,5 +152,27 @@ func addAlbum() gin.HandlerFunc {
 		if result.UpsertedCount != 0 {
 			c.JSON(http.StatusCreated, result)
 		}
+	}
+}
+
+func deleteAlbum() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		number := c.Param("number")
+		newNumber, _ := strconv.Atoi(number)
+		filter := bson.M{"Number": newNumber}
+
+		result, err := collection.DeleteOne(context.TODO(), filter)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		if result.DeletedCount != 1 {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "No document deleted.",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": fmt.Sprintf("Document with number %v is deleted.", newNumber),
+		})
 	}
 }
