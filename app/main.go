@@ -5,29 +5,40 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type album struct {
-	Number int `json:"Number"` 
-	Year int `json:"Year" validate:"required"`
-	Album string `json:"Album" validate:"required"`
-	Artist string `json:"Artist" validate:"required"`
-	Genre string `json:"Genre" validate:"required"`
-	Subgenre string `json:"Subgenre" validate:"required"`
+	Number int `json:"number"` 
+	Year int `json:"year" validate:"required"`
+	Album string `json:"album" validate:"required"`
+	Artist string `json:"artist" validate:"required"`
+	Genre string `json:"genre" validate:"required"`
+	Subgenre string `json:"subgenre" validate:"required"`
+}
+
+func envMongoURI() string {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return os.Getenv("MONGOURI")
 }
 
 func connectDB()  *mongo.Client {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://admin:password@localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(envMongoURI()))
 	if err != nil {
 		log.Fatal(err)
 	}
