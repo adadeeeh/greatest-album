@@ -82,21 +82,25 @@ func getAlbums() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cursor, err := collection.Find(context.TODO(), bson.D{})
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			return
 		}
 
-		var albums []album
+		var results []album
 
 		for cursor.Next(context.TODO()) {
-			var album album
-			if err = cursor.Decode(&album); err != nil {
-				log.Fatal(err)
+			var result album
+			if err = cursor.Decode(&result); err != nil {
+				log.Println(err)
+				return
 			}
 
-			albums = append(albums, album)
+			results = append(results, result)
 		}
 
-		c.JSON(200, albums)
+		c.JSON(http.StatusOK, gin.H{
+			"data": results,
+		})
 	}
 }
 
@@ -108,10 +112,13 @@ func getAlbum() gin.HandlerFunc {
 		var result album
 		err := collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			return
 		}
 
-		c.JSON(200, result)
+		c.JSON(http.StatusOK, gin.H{
+			"data": result,
+		})
 	}
 }
 
@@ -122,6 +129,7 @@ func addAlbum() gin.HandlerFunc {
 		// bind data to struct
 		if err := c.BindJSON(&album); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			log.Println(err)
 			return
 		}
 
@@ -144,13 +152,14 @@ func addAlbum() gin.HandlerFunc {
 		result, err := collection.UpdateOne(context.TODO(), filter, update, opts)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
+			log.Println(err)
 		}
 
 		if result.MatchedCount != 0 {
-			c.JSON(http.StatusCreated, "Matched and replaced an existing document")
+			c.JSON(http.StatusCreated, gin.H{"message": "Matched and replaced an existing document."})
 		}
 		if result.UpsertedCount != 0 {
-			c.JSON(http.StatusCreated, result)
+			c.JSON(http.StatusCreated, gin.H{"message": "Document added."})
 		}
 	}
 }
@@ -164,15 +173,17 @@ func deleteAlbum() gin.HandlerFunc {
 		result, err := collection.DeleteOne(context.TODO(), filter)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			log.Println(err)
 		}
-		if result.DeletedCount != 1 {
+		if result.DeletedCount == 0 {
 			c.JSON(http.StatusOK, gin.H{
 				"message": "No document deleted.",
 			})
-			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Document with number %v is deleted.", newNumber),
-		})
+		if result.DeletedCount == 1 {
+			c.JSON(http.StatusOK, gin.H{
+				"message": fmt.Sprintf("Document with number %v is deleted.", newNumber),
+			})
+		}
 	}
 }
