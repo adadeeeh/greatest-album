@@ -3,17 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
+	"greatest-album/config"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -26,40 +23,10 @@ type album struct {
 	Subgenre string `json:"subgenre" validate:"required"`
 }
 
-func envMongoURI() string {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	return os.Getenv("MONGOURI")
-}
-
-func connectDB()  *mongo.Client {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(envMongoURI()))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-    //ping the database
-    err = client.Ping(ctx, nil)
-    if err != nil {
-        log.Fatal(err)
-    } else {
-		fmt.Println("Connected to MongoDB")
-	}
-
-	return client
-}
-
-var collection = connectDB().Database("greatest-album").Collection("album")
 
 func main() {
 	r := gin.Default()
-
-	connectDB()
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -80,7 +47,7 @@ func main() {
 
 func getAlbums() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cursor, err := collection.Find(context.TODO(), bson.D{})
+		cursor, err := config.Collection.Find(context.TODO(), bson.D{})
 		if err != nil {
 			log.Println(err)
 			return
@@ -110,7 +77,7 @@ func getAlbum() gin.HandlerFunc {
 		newNumber, _ := strconv.Atoi(number)
 
 		var result album
-		err := collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
+		err := config.Collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
 		if err != nil {
 			log.Println(err)
 			return
@@ -149,7 +116,7 @@ func addAlbum() gin.HandlerFunc {
 			"Subgenre": album.Subgenre,
 		}}
 
-		result, err := collection.UpdateOne(context.TODO(), filter, update, opts)
+		result, err := config.Collection.UpdateOne(context.TODO(), filter, update, opts)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 			log.Println(err)
@@ -170,7 +137,7 @@ func deleteAlbum() gin.HandlerFunc {
 		newNumber, _ := strconv.Atoi(number)
 		filter := bson.M{"Number": newNumber}
 
-		result, err := collection.DeleteOne(context.TODO(), filter)
+		result, err := config.Collection.DeleteOne(context.TODO(), filter)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			log.Println(err)
