@@ -1,6 +1,6 @@
 # greatest-album
 
-# Step
+# Steps
 
 1. Download this [csv](https://www.kaggle.com/notgibs/500-greatest-albums-of-all-time-rolling-stone/version/1) and convert it to JSON.
 2. Create **.env** file in **app** folder. Write the **MONGOURI** environment. Example:
