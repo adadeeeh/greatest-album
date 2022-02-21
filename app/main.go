@@ -1,7 +1,7 @@
 package main
 
 import (
-	"greatest-album/controller"
+	"greatest-album/route"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,13 +15,7 @@ func main() {
 		})
 	})
 
-	r.GET("/albums", controller.GetAlbums())
-
-	r.GET("/album/:number", controller.GetAlbum())
-
-	r.POST("album/", controller.AddAlbum())
-
-	r.DELETE("album/:number", controller.DeleteAlbum())
+	route.AlbumRoute(r)
 
 	r.Run()
 }
