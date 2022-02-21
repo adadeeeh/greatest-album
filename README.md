@@ -11,8 +11,11 @@
 4. Install required packages `go get -u github.com/gin-gonic/gin go.mongodb.org/mongo-driver/mongo github.com/joho/godotenv github.com/go-playground/validator/v10`
 
    **github.com/gin-gonic/gin** is a framework for building web applications.
+
    **go.mongodb.org/mongo-driver/mongo** is a driver for connecting to MongoDB.
+
    **github.com/joho/godotenv** is a library for managing environment variables.
+
    **github.com/go-playground/validator/v10** is a library for validating structs and fields.
 
 5. Run `docker-compose up -d`
