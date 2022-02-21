@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -49,6 +50,11 @@ func GetAlbum() gin.HandlerFunc {
 		var result model.Album
 		err := config.Collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
 		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				c.JSON(http.StatusOK, gin.H{
+					"message": fmt.Sprintf("Document with number %v is not found.", newNumber),
+				})
+			}
 			log.Println(err)
 			return
 		}
