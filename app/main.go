@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"greatest-album/config"
+	"greatest-album/model"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,17 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-type album struct {
-	Number int `json:"number"` 
-	Year int `json:"year" validate:"required"`
-	Album string `json:"album" validate:"required"`
-	Artist string `json:"artist" validate:"required"`
-	Genre string `json:"genre" validate:"required"`
-	Subgenre string `json:"subgenre" validate:"required"`
-}
-
-
 
 func main() {
 	r := gin.Default()
@@ -53,10 +43,10 @@ func getAlbums() gin.HandlerFunc {
 			return
 		}
 
-		var results []album
+		var results []model.Album
 
 		for cursor.Next(context.TODO()) {
-			var result album
+			var result model.Album
 			if err = cursor.Decode(&result); err != nil {
 				log.Println(err)
 				return
@@ -76,7 +66,7 @@ func getAlbum() gin.HandlerFunc {
 		number := c.Param("number")
 		newNumber, _ := strconv.Atoi(number)
 
-		var result album
+		var result model.Album
 		err := config.Collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
 		if err != nil {
 			log.Println(err)
@@ -91,7 +81,7 @@ func getAlbum() gin.HandlerFunc {
 
 func addAlbum() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var album album
+		var album model.Album
 		
 		// bind data to struct
 		if err := c.BindJSON(&album); err != nil {
