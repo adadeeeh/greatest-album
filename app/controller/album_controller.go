@@ -37,6 +37,8 @@ func GetAlbums() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
+			"status": http.StatusOK,
+			"message": "success",
 			"data": results,
 		})
 	}
@@ -52,14 +54,24 @@ func GetAlbum() gin.HandlerFunc {
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				c.JSON(http.StatusOK, gin.H{
-					"message": fmt.Sprintf("Document with number %v is not found.", newNumber),
+					"status": http.StatusOK,
+					"message": "error",
+					"data": fmt.Sprintf("Document with number %v is not found", newNumber),
 				})
+				return
 			}
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": http.StatusInternalServerError,
+				"message": "error",
+				"data": err.Error(),
+			})
 			log.Println(err)
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
+			"status": http.StatusOK,
+			"message": "success",
 			"data": result,
 		})
 	}
@@ -71,14 +83,22 @@ func AddAlbum() gin.HandlerFunc {
 		
 		// bind data to struct
 		if err := c.BindJSON(&album); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": http.StatusInternalServerError,
+				"message": "error",
+				"data": err.Error(),
+			})
 			log.Println(err)
 			return
 		}
 
 		// validation empty field
 		if validationErr := validator.New().Struct(&album); validationErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": http.StatusBadRequest,
+				"message": "error",
+				"data": validationErr.Error(),
+			})
 		}
 		
 		opts := options.Update().SetUpsert(true)
@@ -94,15 +114,28 @@ func AddAlbum() gin.HandlerFunc {
 
 		result, err := config.Collection.UpdateOne(context.TODO(), filter, update, opts)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": http.StatusInternalServerError,
+				"message": "error",
+				"data": err.Error(),
+			})
 			log.Println(err)
+			return
 		}
 
 		if result.MatchedCount != 0 {
-			c.JSON(http.StatusCreated, gin.H{"message": "Matched and replaced an existing document."})
+			c.JSON(http.StatusCreated, gin.H{
+				"status": http.StatusOK,
+				"message": "success",
+				"data": "Matched and replaced an existing document",
+			})
 		}
 		if result.UpsertedCount != 0 {
-			c.JSON(http.StatusCreated, gin.H{"message": "Document added."})
+			c.JSON(http.StatusCreated, gin.H{
+				"status": http.StatusOK,
+				"message": "success",
+				"data": "Document added",
+			})
 		}
 	}
 }
@@ -115,17 +148,26 @@ func DeleteAlbum() gin.HandlerFunc {
 
 		result, err := config.Collection.DeleteOne(context.TODO(), filter)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": http.StatusInternalServerError,
+				"message": "error",
+				"data": err.Error(),
+			})
 			log.Println(err)
+			return
 		}
 		if result.DeletedCount == 0 {
 			c.JSON(http.StatusOK, gin.H{
-				"message": "No document deleted.",
+				"status": http.StatusOK,
+				"message": "success",
+				"data": "No document deleted",
 			})
 		}
 		if result.DeletedCount == 1 {
 			c.JSON(http.StatusOK, gin.H{
-				"message": fmt.Sprintf("Document with number %v is deleted.", newNumber),
+				"status": http.StatusOK,
+				"message": "success",
+				"data": fmt.Sprintf("Document with number %v is deleted", newNumber),
 			})
 		}
 	}
