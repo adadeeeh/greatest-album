@@ -40,5 +40,5 @@ func connectDB()  *mongo.Client {
 	return client
 }
 
-var Collection = connectDB().Database("greatest-album").Collection("album")
+var AlbumCollection = connectDB().Database("greatest-album").Collection("album")
 var AccountCollection = connectDB().Database("greatest-album").Collection("account")

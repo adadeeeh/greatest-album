@@ -18,7 +18,7 @@ import (
 
 func GetAlbums() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cursor, err := config.Collection.Find(context.TODO(), bson.D{})
+		cursor, err := config.AlbumCollection.Find(context.TODO(), bson.D{})
 		if err != nil {
 			log.Println(err)
 			return
@@ -50,7 +50,7 @@ func GetAlbum() gin.HandlerFunc {
 		newNumber, _ := strconv.Atoi(number)
 
 		var result model.Album
-		err := config.Collection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
+		err := config.AlbumCollection.FindOne(context.TODO(), bson.M{"Number": newNumber}).Decode(&result)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				c.JSON(http.StatusOK, gin.H{
@@ -112,7 +112,7 @@ func AddAlbum() gin.HandlerFunc {
 			"Subgenre": album.Subgenre,
 		}}
 
-		result, err := config.Collection.UpdateOne(context.TODO(), filter, update, opts)
+		result, err := config.AlbumCollection.UpdateOne(context.TODO(), filter, update, opts)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status": http.StatusInternalServerError,
@@ -146,7 +146,7 @@ func DeleteAlbum() gin.HandlerFunc {
 		newNumber, _ := strconv.Atoi(number)
 		filter := bson.M{"Number": newNumber}
 
-		result, err := config.Collection.DeleteOne(context.TODO(), filter)
+		result, err := config.AlbumCollection.DeleteOne(context.TODO(), filter)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status": http.StatusInternalServerError,
