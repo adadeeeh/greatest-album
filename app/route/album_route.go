@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AlbumRoute(r *gin.Engine) {
-	r.GET("/albums", controller.GetAlbums())
+func AlbumRoute(authorized *gin.RouterGroup) {
+	authorized.GET("/albums", controller.GetAlbums())
 
-	r.GET("/album/:number", controller.GetAlbum())
+	authorized.GET("/album/:number", controller.GetAlbum())
 
-	r.POST("album/", controller.AddAlbum())
+	authorized.POST("album/", controller.AddAlbum())
 
-	r.DELETE("album/:number", controller.DeleteAlbum())
+	authorized.DELETE("album/:number", controller.DeleteAlbum())
 }

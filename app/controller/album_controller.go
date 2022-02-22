@@ -35,7 +35,7 @@ func GetAlbums() gin.HandlerFunc {
 
 			results = append(results, result)
 		}
-
+		
 		c.JSON(http.StatusOK, gin.H{
 			"status": http.StatusOK,
 			"message": "success",
