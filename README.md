@@ -19,8 +19,9 @@
    **github.com/go-playground/validator/v10** is a library for validating structs and fields.
 
 5. Run `docker-compose up -d`
-6. Via Mongo Express, create new collection named **album**. Import file or add data via new document and paste the whole JSON.
-7. Start Gin `go run main.go`
+6. Via Mongo Express, create new collection named **album** inside **greatest-album** database. Import file or add data via new document and paste the whole JSON.
+7. Create collection named **account** inside **greatest-album** database. And create one document with key Username and Password.
+8. Start Gin `go run main.go`
 
 # References
 
@@ -28,3 +29,4 @@
 2. https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo
 3. https://docs.mongodb.com/drivers/go/current/fundamentals/crud/write-operations/upsert/
 4. https://dev.to/hackmamba/build-a-rest-api-with-golang-and-mongodb-gin-gonic-version-269m
+5. https://jonathanmh.com/go-gin-http-basic-auth/
