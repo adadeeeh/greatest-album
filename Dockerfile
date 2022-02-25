@@ -9,8 +9,20 @@ RUN go mod download
 
 COPY app/ ./
 
-RUN go build -o /webapp
+RUN go build -o webapp
+
+# EXPOSE 8080
+
+# CMD ["/app/webapp"]
+
+
+FROM bash:4.0.44
+
+WORKDIR /app
+
+COPY --from=build /app/.env ./
+COPY --from=build /app/webapp ./
 
 EXPOSE 8080
 
-CMD ["/webapp"]
+ENTRYPOINT [ "/app/webapp" ]
