@@ -25,4 +25,8 @@ COPY --from=build /app/webapp ./
 
 EXPOSE 8080
 
+RUN addgroup -S go && adduser -S go -G go
+RUN chown -R go:go ./
+USER go
+
 ENTRYPOINT [ "/app/webapp" ]
