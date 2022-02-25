@@ -9,7 +9,7 @@
    ```
    Example if usinf docker-compose:
    ```
-      MONGOURI=mongodb://admin:password@name_of_the_mongodb_service
+   MONGOURI=mongodb://admin:password@name_of_the_mongodb_service
    ```
 3. Initialize Go module `go mod init greatest-album`
 4. Install required packages `go get -u github.com/gin-gonic/gin go.mongodb.org/mongo-driver/mongo github.com/joho/godotenv github.com/go-playground/validator/v10`
