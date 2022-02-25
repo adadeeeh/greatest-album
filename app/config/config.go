@@ -13,6 +13,11 @@ import (
 )
 
 func envMongoURI() string {
+	// dir, oldErr := os.Getwd()
+	// if oldErr != nil {
+	// 	log.Fatal(oldErr)
+	// }
+	// fmt.Println(dir)
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
