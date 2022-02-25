@@ -3,9 +3,13 @@
 # Steps
 
 1. Download this [csv](https://www.kaggle.com/notgibs/500-greatest-albums-of-all-time-rolling-stone/version/1) and convert it to JSON.
-2. Create **.env** file in **app** folder. Write the **MONGOURI** environment. Example:
+2. Create **.env** file in **app** folder. Write the **MONGOURI** environment. Example if not using docker-compose:
    ```
    MONGOURI=mongodb://admin:password@localhost:27017
+   ```
+   Example if usinf docker-compose:
+   ```
+      MONGOURI=mongodb://admin:password@name_of_the_mongodb_service
    ```
 3. Initialize Go module `go mod init greatest-album`
 4. Install required packages `go get -u github.com/gin-gonic/gin go.mongodb.org/mongo-driver/mongo github.com/joho/godotenv github.com/go-playground/validator/v10`
