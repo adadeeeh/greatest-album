@@ -7,7 +7,7 @@
    ```
    MONGOURI=mongodb://admin:password@localhost:27017
    ```
-   Example if usinf docker-compose:
+   Example if using docker-compose:
    ```
    MONGOURI=mongodb://admin:password@name_of_the_mongodb_service
    ```
