@@ -28,6 +28,13 @@
 8. Create collection named **account** inside **greatest-album** database. And create one document with key Username and Password.
 9. Start Gin `go run main.go`
 
+# API
+
+1. Get all album ![](images/get-all-album.png)
+2. Get specific album ![](images/get-album-by-ranking-number.png)
+3. Create album ![](images/create-album.png)
+4. Delete specific album ![](images/delete-album-by-ranking-number.png)
+
 # References
 
 1. https://pkg.go.dev/github.com/gin-gonic/gin
