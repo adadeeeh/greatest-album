@@ -22,10 +22,11 @@
 
    **github.com/go-playground/validator/v10** is a library for validating structs and fields.
 
-5. Run `docker-compose up -d`
-6. Via Mongo Express, create new collection named **album** inside **greatest-album** database. Import file or add data via new document and paste the whole JSON.
-7. Create collection named **account** inside **greatest-album** database. And create one document with key Username and Password.
-8. Start Gin `go run main.go`
+5. Create a docker image named **webapp:multistage** by running command `docker build -t webapp:multistage .`
+6. Run `docker-compose up -d`
+7. Via Mongo Express, create new collection named **album** inside **greatest-album** database. Import file or add data via new document and paste the whole JSON.
+8. Create collection named **account** inside **greatest-album** database. And create one document with key Username and Password.
+9. Start Gin `go run main.go`
 
 # References
 
